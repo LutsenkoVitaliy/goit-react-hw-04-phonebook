@@ -7,67 +7,52 @@ import ContactList from './ContactList';
 import Filter from './Filter';
 
 export default function App() {
-  const [contacts, setcontacts] = useState(() => {
+  const [contacts, setContacts] = useState(() => {
     return JSON.parse(localStorage.getItem('contacts')) ?? []
   });
-  // componentDidMount() {
-  //   const contacts = localStorage.getItem('contacts')
-  //   const parsedContacts = JSON.parse(contacts)
-   
-  //   if (parsedContacts) {
-  //     this.setState({ contacts: parsedContacts })
-  //   }
-  // }
+  const [filter, setFilter] = useState('')
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts))
-  }, [contacts])
-  // componentDidUpdate(prevState) {
-  //   if (this.state.contacts !== prevState.contacts) {
-  //     localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
-  //   }
-  // }
+  }, [contacts]);
 
-  deletedContact = contactId => {
-    this.setState(prevState => ({
-     contacts: prevState.contacts.filter(contact => contact.id !== contactId)
-   }))
-  }
+ 
+  const deletedContact = contactId => {
+    setContacts(contacts.filter(contact => contact.id !== contactId))
+  };
 
-  formSubmitHandler = ({ name, number }) => {
+
+  const formSubmitHandler = (name, number) => {
     const normalazedFind = name.toLowerCase();
-    const findName = this.state.contacts.find(contact => contact.name.toLowerCase() === normalazedFind);
+    const findName = contacts.find(contact => contact.name.toLowerCase() === normalazedFind);
 
     if (findName) {
       return alert(`${name} is alredy in contacts.`)
     };
 
-    this.setState(({ contacts }) => ({
-      contacts: [{ name, number, id: nanoid() }, ...contacts]
-    }));
+    setContacts([{name, number, id: nanoid()}, ...contacts]);
   };
 
-  changeFilter = event => {
-    const { value } = event.currentTarget
-    this.setState({ filter: value })
+
+  const changeFilter = event => {
+    setFilter(event.currentTarget.value)
   };
 
-  getVisibleContacts = () => {
-    const { filter, contacts } = this.state;
+  const getVisibleContacts = () => {
     const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(({ name }) =>
-      name.toLowerCase().includes(normalizedFilter))
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter))
   };
 
 
   return (
     <Container>
     <h1> Phonebook</h1>
-    <ContactForm onSubmit={this.formSubmitHandler} />
+    <ContactForm onSubmit={formSubmitHandler} />
     
     <h2>Contacts</h2>
-        <Filter filter={filter} onChange={this.changeFilter}/>
-    <ContactList contacts={visibleContacts} onDeleteContact={this.deletedContact} />  
+        <Filter filter={filter} onChange={changeFilter}/>
+    <ContactList contacts={getVisibleContacts()} onDeleteContact={deletedContact} />  
     </Container>
   )
 }
